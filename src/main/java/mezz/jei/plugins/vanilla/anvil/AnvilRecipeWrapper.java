@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.Lists;
 import mezz.jei.api.gui.IGuiIngredient;
@@ -17,6 +18,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
 public class AnvilRecipeWrapper implements IRecipeWrapper {
+	private static AtomicInteger totalVals = new AtomicInteger(0);
 	private final List<List<ItemStack>> inputs;
 	private final List<List<ItemStack>> output;
 	@Nullable
@@ -28,11 +30,13 @@ public class AnvilRecipeWrapper implements IRecipeWrapper {
 	private int lastCost;
 
 	public AnvilRecipeWrapper(ItemStack leftInput, List<ItemStack> rightInputs, List<ItemStack> outputs) {
-		this.inputs = Lists.newArrayList();
-		this.inputs.add(Collections.singletonList(leftInput));
-		this.inputs.add(rightInputs);
+		int total = totalVals.addAndGet(1 + rightInputs.size() + outputs.size());
+		if (total % 100 == 0) System.out.println("Total ingredient " + total);
+		this.inputs = null;//Lists.newArrayList();
+//		this.inputs.add(Collections.singletonList(leftInput));
+//		this.inputs.add(rightInputs);
 
-		this.output = Collections.singletonList(outputs);
+		this.output = null;//Collections.singletonList(outputs);
 	}
 
 	@Override
@@ -41,36 +45,36 @@ public class AnvilRecipeWrapper implements IRecipeWrapper {
 			return;
 		}
 
-		ItemStack newLeftStack = currentIngredients.get(0).getDisplayedIngredient();
-		ItemStack newRightStack = currentIngredients.get(1).getDisplayedIngredient();
-
-		if (newLeftStack == null || newRightStack == null) {
-			return;
-		}
-
-		if (lastLeftStack == null || lastRightStack == null
-				|| !ItemStack.areItemStacksEqual(lastLeftStack, newLeftStack)
-				|| !ItemStack.areItemStacksEqual(lastRightStack, newRightStack)) {
-			lastLeftStack = newLeftStack;
-			lastRightStack = newRightStack;
-			lastCost = AnvilRecipeMaker.findLevelsCost(lastLeftStack, lastRightStack);
-		}
-
-		if (lastCost != 0) {
-			String costText = lastCost < 0 ? "err" : Integer.toString(lastCost);
-			String text = I18n.format("container.repair.cost", costText);
-
-			int mainColor = 0xFF80FF20;
-			EntityPlayerSP player = minecraft.player;
-			if (player != null &&
-				(lastCost >= 40 || lastCost > player.experienceLevel) &&
-				!player.capabilities.isCreativeMode) {
-				// Show red if the player doesn't have enough levels
-				mainColor = 0xFFFF6060;
-			}
-
-			drawRepairCost(minecraft, text, mainColor, recipeWidth);
-		}
+//		ItemStack newLeftStack = currentIngredients.get(0).getDisplayedIngredient();
+//		ItemStack newRightStack = currentIngredients.get(1).getDisplayedIngredient();
+//
+//		if (newLeftStack == null || newRightStack == null) {
+//			return;
+//		}
+//
+//		if (lastLeftStack == null || lastRightStack == null
+//				|| !ItemStack.areItemStacksEqual(lastLeftStack, newLeftStack)
+//				|| !ItemStack.areItemStacksEqual(lastRightStack, newRightStack)) {
+//			lastLeftStack = newLeftStack;
+//			lastRightStack = newRightStack;
+//			lastCost = AnvilRecipeMaker.findLevelsCost(lastLeftStack, lastRightStack);
+//		}
+//
+//		if (lastCost != 0) {
+//			String costText = lastCost < 0 ? "err" : Integer.toString(lastCost);
+//			String text = I18n.format("container.repair.cost", costText);
+//
+//			int mainColor = 0xFF80FF20;
+//			EntityPlayerSP player = minecraft.player;
+//			if (player != null &&
+//				(lastCost >= 40 || lastCost > player.experienceLevel) &&
+//				!player.capabilities.isCreativeMode) {
+//				// Show red if the player doesn't have enough levels
+//				mainColor = 0xFFFF6060;
+//			}
+//
+//			drawRepairCost(minecraft, text, mainColor, recipeWidth);
+//		}
 	}
 
 	private void drawRepairCost(Minecraft minecraft, String text, int mainColor, int recipeWidth) {
@@ -93,11 +97,11 @@ public class AnvilRecipeWrapper implements IRecipeWrapper {
 
 	@Override
 	public void getIngredients(IIngredients ingredients) {
-		ingredients.setInputLists(VanillaTypes.ITEM, inputs);
-		ingredients.setOutputLists(VanillaTypes.ITEM, output);
+//		ingredients.setInputLists(VanillaTypes.ITEM, inputs);
+//		ingredients.setOutputLists(VanillaTypes.ITEM, output);
 	}
 
 	public void setCurrentIngredients(Map<Integer, ? extends IGuiIngredient<ItemStack>> currentIngredients) {
-		this.currentIngredients = currentIngredients;
+//		this.currentIngredients = currentIngredients;
 	}
 }
